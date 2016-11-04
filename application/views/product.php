@@ -95,10 +95,26 @@ if ($flag == 'no' && !isset($_POST['name'])){
 		});
 
         $('#product_form').submit(function(){
-            $.post("http://localhost/w3/product/createTransaction", $('#product_form').serialize(), function(data, status){
-                // $('#message').val(data)
-                $('input[name="reference_id"]').val(data);
-            });
+			if($('input[name="chk"]').val() == ''){
+				$('#amount').val(($('#amount').val()/1).toFixed(2))
+				var disabled = $('#product_form').find(':input:disabled').removeAttr('disabled');
+				var serializedFormData = $('#product_form').serialize();
+				disabled.attr('disabled','disabled');
+				$('#btn_submit').addClass('disabled');
+	            $.post("<?php echo base_url() ?>product/createTransaction", serializedFormData, function(data, status){
+	                // $('#message').val(data)
+					data = JSON.parse(data);
+	                $('input[name="referenceID"]').val(data.referenceID);
+	                $('input[name="transactionTime"]').val(data.transactionTime);
+	                $('input[name="chk"]').val(data.chk);
+					$('#product_form').submit();
+	            });
+
+				return false;
+			} else {
+				//alert('submit');
+				//return false;
+			}
         });
 	});
 </script>
@@ -177,7 +193,7 @@ if ($flag == 'no' && !isset($_POST['name'])){
     <div class="form-group">
       <label class="col-sm-4 control-label" for="amount">Amount</label>
       <div class="col-sm-6 col-lg-4">
-      <input id="amount" name="amount" type="number" placeholder="" class="form-control input-md" required="">
+      <input id="amount" name="amount" type="number" placeholder="" class="form-control input-md" required="" value='100.00'>
       </div>
     </div>
 
@@ -185,7 +201,7 @@ if ($flag == 'no' && !isset($_POST['name'])){
     <div class="form-group">
       <label class="col-sm-4 control-label" for="platform_email">Platform Email</label>
       <div class="col-sm-6 col-lg-4">
-      <input id="platform_email" name="platform_email" type="text" placeholder="" class="form-control input-md" required="">
+      <input id="platform_email" name="platform_email" type="text" placeholder="" class="form-control input-md" required="" value='alan_98797@hotmail.com'>
 
       </div>
     </div>
@@ -259,7 +275,7 @@ if ($flag == 'no' && !isset($_POST['name'])){
     <div class="form-group">
       <!-- <label class="col-sm-4 control-label" for=""> </label> -->
       <div class="col-sm-offset-4 col-sm-4 text-center">
-        <button type="submit" class="btn btn-5 btn-5b fa-send"><span>Send</span></button>
+        <button id='btn_submit' type="submit" class="btn btn-5 btn-5b fa-send"><span>Send</span></button>
       </div>
     </div>
 
